@@ -13,9 +13,9 @@ import java.util.Scanner;
  *      Dynamically create the game board based on the selected size.                                                                                   X
  *      Adjust the winning conditions based on the grid size.                                                                                           X
  *  Timed Moves:
- *      Introduce a time limit for each player's move.
- *      Display a countdown timer for each player's turn.
- *      If a player exceeds the time limit, they forfeit their turn, and the other player makes the next move.
+ *      Introduce a time limit for each player's move.                                                                                                  X
+ *      Display a countdown timer for each player's turn.                                                                                               X
+ *      If a player exceeds the time limit, they forfeit their turn, and the other player makes the next move.                                          X
  *  AI Opponent with Difficulty Levels:                         
  *      Implement an AI opponent with different difficulty levels (easy, medium, hard).
  *      Easy: The AI makes random moves.
@@ -35,6 +35,10 @@ public class Tictactoe
         EMPTY,
         X,
         O
+    }
+
+    public static int getBoardMapLength() {
+        return boardMap.length;
     }
 
     // Used for printing the board to the terminal.
@@ -223,30 +227,39 @@ public class Tictactoe
         if(currentPlayer == BoardPiece.X) currentPlayer = BoardPiece.O;
         else currentPlayer = BoardPiece.X;
 
-        int index;
+        int index = -1;
         char playerToken;
         if(currentPlayer == BoardPiece.X) playerToken = 'X';
         else playerToken = 'O';
         System.out.println("Player " + playerToken + "'s turn. Where would you like to place your piece? (Type 1, 2, 3, etc.)");
-        while(true) {
-            System.out.print("> ");
-            
+
+        InputTimer timedReader = new InputTimer(20);
+        while(timedReader.getPosition() == -1) {
             try {
-                index = Integer.parseInt(reader.nextLine())-1;
-
-            } catch(NumberFormatException ex) {
-                System.out.println("Invalid Input. Please enter the position of the box. (1, 2, 3, etc.)");
-                continue;
+                Thread.sleep(16);
+            } catch(InterruptedException ex) {
+                throw new RuntimeException(ex);
             }
-
-            if(index >= boardMap.length)
-                System.out.println("The position given is greater than the size of the board. Please try again.");
-            else if(index < 0)
-                System.out.println("The position given is smaller than the size of the board. Please try again.");
-            else if(!validPosition(index))
-                System.out.println("The position already has an X or O. Please try again.");
-            else break;
         }
+
+        index = timedReader.getPosition();
+        if(index == -2) return;
+            
+            // try {
+            //     index = Integer.parseInt(reader.nextLine())-1;
+            // } catch(NumberFormatException ex) {
+            //     System.out.println("Invalid Input. Please enter the position of the box. (1, 2, 3, etc.)");
+            //     continue;
+            // }
+
+            // if(index >= boardMap.length)
+            //     System.out.println("The position given is greater than the size of the board. Please try again.");
+            // else if(index < 0)
+            //     System.out.println("The position given is smaller than the size of the board. Please try again.");
+            // else if(!validPosition(index))
+            //     System.out.println("The position already has an X or O. Please try again.");
+            // else break;
+            // break;
 
         insertPiece(index, currentPlayer);
 
