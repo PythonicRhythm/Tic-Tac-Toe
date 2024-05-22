@@ -9,31 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 public class InputTimer {
 
-    // private final int timeLimit;
-    // private boolean killFlag;
-
-    // InputTimer(int timeLimit) {
-    //     this.timeLimit = timeLimit;
-    //     killFlag = false;
-    // }
-
-    // public void kill() {
-    //     this.killFlag = true;
-    // }
-
-    // public void run() {
-
-    //     try {
-    //         for(int i = timeLimit; i >= 0; i--) {
-    //             Thread.sleep(1000);         // sleep for a second
-    //             System.out.println("Timer: " + i); // display time left. 
-    //         }
-    //         System.out.println("Ran out of time!");
-    //     } catch(InterruptedException ex) {
-    //         throw new RuntimeException(ex);
-    //     }
-    // }
-
     private final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private final int timeLimit;
     private final ExecutorService threadPool = Executors.newVirtualThreadPerTaskExecutor();
@@ -63,7 +38,7 @@ public class InputTimer {
             int input;
             while(true) {
                 while(!reader.ready()) 
-                {Thread.sleep(16);}
+                {Thread.sleep(10);}
                 try {
                     input = Integer.parseInt(reader.readLine())-1;
                 } catch(NumberFormatException ex) {
@@ -90,8 +65,7 @@ public class InputTimer {
     private void handleTimer() {
         for(int i = timeLimit; i >= 0; i--) {
             try {
-                Thread.sleep(1500);         // sleep for a second
-                System.out.println("Timer: " + i); // display time left. 
+                Thread.sleep(1000);         // sleep for a second
             } catch(InterruptedException ex) {
                 throw new RuntimeException(ex);
             }

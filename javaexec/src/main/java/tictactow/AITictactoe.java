@@ -18,15 +18,18 @@ import java.io.InputStreamReader;
  *      Introduce a time limit for each player's move.                                                                                                  X
  *      Display a countdown timer for each player's turn.                                                                                               X
  *      If a player exceeds the time limit, they forfeit their turn, and the other player makes the next move.                                          X
+ *  AI Opponent with Difficulty Levels:                         
+ *      Implement an AI opponent with different difficulty levels (easy, medium, hard).
+ *      Easy: The AI makes random moves.
+ *      Medium: The AI uses a basic strategy to block the player's winning moves and make its own winning moves.
+ *      Hard: The AI uses advanced algorithms like the minimax algorithm to make optimal moves. https://www.neverstopbuilding.com/blog/minimax
  *
  */
-public class Tictactoe 
+public class AITictactoe 
 {
     static private BoardPiece[] boardMap;                       // An array that represents the board layout of tic-tac-toe
     static private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));     // Console Input Reader
-    static private BoardPiece currentPlayer = BoardPiece.O;     // currentPlayer will help us keep track of who's turn it currently is.
-                                                                // By default player X goes first but since we swap on every insertion first
-                                                                // we set it as O.
+    static private int AIDiff;
 
     // This enum represents tic-tac-toe pieces or the lack of it.
     enum BoardPiece {
@@ -108,6 +111,32 @@ public class Tictactoe
             boardMap[i] = BoardPiece.EMPTY;
         }
         System.out.println("Board Size is set!");
+    }
+
+    static void setAIDifficulty() {
+        System.out.println("Enter an AI difficulty setting.");
+        System.out.println("1. Easy\n2. Medium\n3. Hard");
+
+        int response;
+        while(true) {
+
+            System.out.print("> ");
+
+            try {
+                response = Integer.parseInt(reader.readLine());
+            } catch(IOException | NumberFormatException ex) {
+                System.out.println("Invalid Input. Please enter a number 1-3.");
+                continue;
+            }
+
+            if(response > 3 || response < 1) 
+                System.out.println("Invalid Input. Please enter a number 1-3.");
+            else {
+                AIDiff = response;
+                break;
+            }
+        }
+
     }
 
     // Checks if a player has won following a piece placement.
@@ -236,15 +265,10 @@ public class Tictactoe
     static void gatherPlayerPlacement() {
 
         // Swap turns!
-        if(currentPlayer == BoardPiece.X) currentPlayer = BoardPiece.O;
-        else currentPlayer = BoardPiece.X;
 
         int index = -1;
-        char playerToken;
         int timeLimit = 10;
-        if(currentPlayer == BoardPiece.X) playerToken = 'X';
-        else playerToken = 'O';
-        System.out.println("Player " + playerToken + "'s turn. Where would you like to place your piece?  You have " + timeLimit + " seconds! (Type 1, 2, 3, etc.)");
+        System.out.println("Player's turn. Where would you like to place your piece?  You have " + timeLimit + " seconds! (Type 1, 2, 3, etc.)");
 
         // Call alternate threads to handle input and timer at the same time.
         // Let the main thread sleep until the alternates are completed with
@@ -261,7 +285,31 @@ public class Tictactoe
         index = timedReader.getPosition();
         if(index == -2) return;
 
-        insertPiece(index, currentPlayer);
+        insertPiece(index, BoardPiece.X);
+
+    }
+
+    // AITurn() will simulate a turn made by the AI.
+    // Should insert a piece based on the difficulty setting
+    // and check if the AI won following that placement.
+    static void AITurn() {
+
+        if(AIDiff == 1) easyAIPlacement();
+        else if(AIDiff == 2) mediumAIPlacement();
+        else hardAIPlacement();
+
+
+    }
+
+    static void easyAIPlacement() {
+
+    }
+
+    static void mediumAIPlacement() {
+
+    }
+
+    static void hardAIPlacement() {
 
     }
 
@@ -270,6 +318,7 @@ public class Tictactoe
         System.out.println("\nWelcome to Multiplayer Tic-Tac-Toe!");
         
         initializeBoardSize();
+        setAIDifficulty();
         printBoard();
         
         while(!boardIsFull()) {
@@ -277,15 +326,14 @@ public class Tictactoe
             printBoard();
 
             if(checkIfPlayerWon()) {
-                char playerToken;
-                if(currentPlayer == BoardPiece.X) playerToken = 'X';
-                else playerToken = 'O';
-                System.out.println(playerToken + " player has won!");
+                System.out.println("Player has won!");
                 try {Thread.sleep(1000);}
                 catch(InterruptedException ex) {throw new RuntimeException(ex);}
                 System.out.println("Closing Multiplayer Tic-Tac-Toe...");
                 return;
             }
+
+            AITurn();
         }
 
         try {Thread.sleep(1000);}
