@@ -23,10 +23,10 @@ import java.io.InputStreamReader;
 public class Tictactoe 
 {
     static private BoardPiece[] boardMap;                       // An array that represents the board layout of tic-tac-toe
-    static private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));     // Console Input Reader
-    static private BoardPiece currentPlayer = BoardPiece.O;     // currentPlayer will help us keep track of who's turn it currently is.
-                                                                // By default player X goes first but since we swap on every insertion first
-                                                                // we set it as O.
+    static private BufferedReader reader = new 
+            BufferedReader(new InputStreamReader(System.in));   // Console Input Reader
+    static private BoardPiece currentPlayer = BoardPiece.O;     // keeps track of the current player's to manage turns.
+    static private int size;                                    // The length and width of the tic-tac-toe board.
 
     // This enum represents tic-tac-toe pieces or the lack of it.
     enum BoardPiece {
@@ -34,8 +34,9 @@ public class Tictactoe
         X,
         O
     }
-
-    public static int getBoardMapLength() {
+    
+    // Returns the amount of slots in the board.
+    public static int getBoardPieceAmount() {
         return boardMap.length;
     }
 
@@ -43,10 +44,11 @@ public class Tictactoe
     static void printBoard() {
         
         System.out.println();
+
+        // For every tile in the board
         for(int i = 0; i < boardMap.length; i++) {
 
             // Gather size and specific element.
-            int rowSize = (int) Math.sqrt(boardMap.length);
             BoardPiece element = boardMap[i];
 
             // Print the specific piece.
@@ -54,10 +56,12 @@ public class Tictactoe
             else if(element == BoardPiece.X) System.out.print("X");
             else System.out.print("O");
 
-            if((i+1) % rowSize == 0) {
+            // if the tile is at the end of the board
+            // create a separator line.
+            if((i+1) % size == 0) {
                 System.out.println();
                 String separator = "-";
-                String line = separator.repeat(rowSize + rowSize-1);
+                String line = separator.repeat(size + size-1);
                 System.out.println(line);
             }
             else System.out.print("|");
@@ -68,28 +72,31 @@ public class Tictactoe
     // Initialize the board size using user input.
     static void initializeBoardSize() {
         
-        int size;
+        int length;
         System.out.println("What is your designated board size?");
         System.out.println("For 3x3 type 3, 4x4 type 4, etc.");
         while(true) {
             System.out.print("> ");
 
-            // Catch string input.
+            // Catch string input given by the user.
             try {
-                size = Integer.parseInt(reader.readLine());
-                if(size < 3) {
+                length = Integer.parseInt(reader.readLine());
+                if(length < 3) {
                     System.out.println("The board size must be 3x3 minimum. Please try again.");
                     continue;
                 }
                 break;
-            } catch(IOException | NumberFormatException ex) {
+            } 
+            // Let the user know that only numbers are allowed.
+            catch(IOException | NumberFormatException ex) {
                 System.out.println("Invalid Input. Please enter a number.");
                 continue;
             }
 
         }
 
-        boardMap = new BoardPiece[size*size];
+        boardMap = new BoardPiece[length*length];
+        size = length;
         for(int i = 0; i < boardMap.length; i++) {
             boardMap[i] = BoardPiece.EMPTY;
         }
@@ -97,13 +104,17 @@ public class Tictactoe
     }
 
     // Initialize the board size using parameter size.
-    static void initializeBoardSize(int size) {
-        if(size < 3) {
+    static void initializeBoardSize(int length) {
+
+        // The minimum board size is a 3x3
+        if(length < 3) {
             System.out.println("Board size must be a minimum of 3x3.");
             return;
         }
 
-        boardMap = new BoardPiece[size*size];
+        // Initialize the BoardPiece array and set all elements as empty.
+        boardMap = new BoardPiece[length*length];
+        size = length;
         for(int i = 0; i < boardMap.length; i++) {
             boardMap[i] = BoardPiece.EMPTY;
         }
@@ -112,8 +123,6 @@ public class Tictactoe
 
     // Checks if a player has won following a piece placement.
     static boolean checkIfPlayerWon() {
-        
-        int size = (int) Math.sqrt(boardMap.length);
         
         // We need to check by row. Ex: assuming 3x3 we send index 0,3,6
         // so that checkValidRow() checks every piece on that row.
@@ -145,7 +154,7 @@ public class Tictactoe
         BoardPiece startingPiece = boardMap[row];
         if(startingPiece == BoardPiece.EMPTY) return false;
 
-        int size = (int) Math.sqrt(boardMap.length);
+        // if any of the row pieces do not match, no victory
         for(int i = row+1; i < row+size; i++) {
             if(boardMap[i] != startingPiece) return false;
         }
@@ -159,7 +168,7 @@ public class Tictactoe
         BoardPiece startingPiece = boardMap[column];
         if(startingPiece == BoardPiece.EMPTY) return false;
 
-        int size = (int) Math.sqrt(boardMap.length);
+        // if any of the column pieces do not match, no victory
         for(int i = column+size; i < boardMap.length; i=i+size) {
             if(boardMap[i] != startingPiece) return false;
         }
@@ -171,10 +180,10 @@ public class Tictactoe
     // to bottom right has been filled by the same piece.
     static boolean checkLeftDiagonal() {
 
-        int size = (int) Math.sqrt(boardMap.length);
         BoardPiece leftDiag = boardMap[0];
         if(leftDiag == BoardPiece.EMPTY) return false;
 
+        // if any of the diagonal pieces do not match, no victory
         if(leftDiag != BoardPiece.EMPTY) {
             for(int i = size+1; i < boardMap.length; i=i+size+1) {
                 if(boardMap[i] != leftDiag) return false;
@@ -188,10 +197,10 @@ public class Tictactoe
     // to bottom left has been filled by the same piece.
     static boolean checkRightDiagonal() {
 
-        int size = (int) Math.sqrt(boardMap.length);
         BoardPiece rightDiag = boardMap[size-1];
         if(rightDiag == BoardPiece.EMPTY) return false;
 
+        // if any of the diagonal pieces do not match, no victory
         if(rightDiag != BoardPiece.EMPTY) {
             for(int i = (size-1)*2; i < boardMap.length-(size-1); i=i+(size-1)) {
                 if(boardMap[i] != rightDiag) return false;
@@ -204,6 +213,7 @@ public class Tictactoe
     // Insert a proper piece (X or O) into the board.
     static void insertPiece(int index, BoardPiece piece) {
 
+        // Do not allow the placement of empty pieces.
         if(piece == BoardPiece.EMPTY) {
             System.out.println("You can not insert an empty piece. Insert an X or O game piece.");
             return;
@@ -223,6 +233,8 @@ public class Tictactoe
     // Check if the board is full of valid pieces (X or O).
     static boolean boardIsFull() {
         
+        // for every tile, if one of them is empty,
+        // the board is not full.
         for(BoardPiece element: boardMap) {
             if(element == BoardPiece.EMPTY) return false;
         }
@@ -239,11 +251,13 @@ public class Tictactoe
         if(currentPlayer == BoardPiece.X) currentPlayer = BoardPiece.O;
         else currentPlayer = BoardPiece.X;
 
-        int index = -1;
-        char playerToken;
-        int timeLimit = 10;
+        int index = -1;         // index of the tile which will be filled
+        char playerToken;       // the current players token
+        int timeLimit = 10;     // the amount of time the user has to pick a choice.
+        
         if(currentPlayer == BoardPiece.X) playerToken = 'X';
         else playerToken = 'O';
+        
         System.out.println("Player " + playerToken + "'s turn. Where would you like to place your piece?  You have " + timeLimit + " seconds! (Type 1, 2, 3, etc.)");
 
         // Call alternate threads to handle input and timer at the same time.
@@ -265,29 +279,47 @@ public class Tictactoe
 
     }
 
+    // run() manages the Main Loop of tic-tac-toe.
+    // initializes the board size then enters
+    // the main loop which places player pieces by turn
+    // and after an insertion checks if the current 
+    // player won.
     public static void run()
     {
         System.out.println("\nWelcome to Multiplayer Tic-Tac-Toe!");
         
+        // initialize board size
         initializeBoardSize();
+
+        // update with visual representation.
         printBoard();
         
+        // Main Game Loop which only breaks
+        // when a draw occurs (the board is full with no victory)
         while(!boardIsFull()) {
+
+            // Begin with the current player's turn. 
+            // Gather input and place player piece.
             gatherPlayerPlacement();
             printBoard();
 
+            // Check if the current player won after insertion.
             if(checkIfPlayerWon()) {
+
                 char playerToken;
+                
                 if(currentPlayer == BoardPiece.X) playerToken = 'X';
                 else playerToken = 'O';
+                
                 System.out.println(playerToken + " player has won!");
-                try {Thread.sleep(1000);}
+                try {Thread.sleep(1000);} // slow down terminal output for a second
                 catch(InterruptedException ex) {throw new RuntimeException(ex);}
                 System.out.println("Closing Multiplayer Tic-Tac-Toe...");
                 return;
             }
         }
 
+        // If the main loop breaks, a draw has occurred.
         try {Thread.sleep(1000);}
         catch(InterruptedException ex) {throw new RuntimeException(ex);}
         System.out.println("It's a draw!");

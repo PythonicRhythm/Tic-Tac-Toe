@@ -31,7 +31,8 @@ public class Launcher {
                 Tictactoe.run();
             }
             else if(response == 2) {
-                System.out.println("Not Implemented");
+                System.out.println("Launching AI Tic-tac-toe...");
+                AITictactoe.run();
             }
             else {
                 System.out.println("Invalid response. Please enter a number from 1-3.");
